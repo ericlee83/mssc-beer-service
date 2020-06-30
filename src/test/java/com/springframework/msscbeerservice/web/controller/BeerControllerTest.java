@@ -6,6 +6,7 @@ import com.springframework.msscbeerservice.repositories.BeerRepository;
 import com.springframework.msscbeerservice.web.model.BeerDto;
 import com.springframework.msscbeerservice.web.model.BeerStyleEnum;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,6 +50,18 @@ class BeerControllerTest {
     @MockBean
     BeerRepository beerRepository;
 
+    BeerDto validBeer;
+
+    @BeforeEach
+    public void setUp(){
+        validBeer = BeerDto.builder()
+                .beerName("my beer")
+                .beerStyle(BeerStyleEnum.PALE_ALE)
+                .upc(123121234L)
+                .price(new BigDecimal("5.99"))
+                .build();
+    }
+
     @Test
     void getBeerById() throws Exception {
         given(beerRepository.findById(any())).willReturn(Optional.of(Beer.builder().build()));
@@ -64,10 +78,10 @@ class BeerControllerTest {
                                 parameterWithName("iscold").description("Is Beer cold query param")
                         ),
                         responseFields(
-                                fieldWithPath("id").description("Id of beer"),
-                                fieldWithPath("version").description("Version number"),
-                                fieldWithPath("createdDate").description("Date Created"),
-                                fieldWithPath("lastModifiedDate").description("Date Updated"),
+                                fieldWithPath("id").description("Id of beer").type(UUID.class),
+                                fieldWithPath("version").description("Version number").type(Integer.class),
+                                fieldWithPath("createdDate").description("Date Created").type(OffsetDateTime.class),
+                                fieldWithPath("lastModifiedDate").description("Date Updated").type(OffsetDateTime.class),
                                 fieldWithPath("beerName").description("Beer Name"),
                                 fieldWithPath("beerStyle").description("Beer Style"),
                                 fieldWithPath("upc").description("UPC of beer"),
@@ -79,8 +93,7 @@ class BeerControllerTest {
 
     @Test
     void saveNewBeer() throws Exception {
-        BeerDto beerDto = getValidBeerDto();
-        String beerDtoJson = objectMapper.writeValueAsString(beerDto);
+        String beerDtoJson = objectMapper.writeValueAsString(validBeer);
 
         ConstrainedFields fields = new ConstrainedFields(BeerDto.class);
 
@@ -103,20 +116,11 @@ class BeerControllerTest {
 
     @Test
     void updateBeerById() throws Exception {
-        BeerDto beerDto = getValidBeerDto();
-        String beerDtoJson = objectMapper.writeValueAsString(beerDto);
+        String beerDtoJson = objectMapper.writeValueAsString(validBeer);
         mockMvc.perform(put("/api/v1/beer/"+UUID.randomUUID().toString()).contentType(MediaType.APPLICATION_JSON).content(beerDtoJson))
                 .andExpect(status().isNoContent());
     }
 
-    BeerDto getValidBeerDto(){
-        return BeerDto.builder()
-                .beerName("my beer")
-                .beerStyle(BeerStyleEnum.PALE_ALE)
-                .upc(123121234L)
-                .price(new BigDecimal("5.99"))
-                .build();
-    }
 
     private static class ConstrainedFields{
         private final ConstraintDescriptions constraintDescriptions;
