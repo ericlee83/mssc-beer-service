@@ -3,6 +3,7 @@ package com.springframework.msscbeerservice.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springframework.msscbeerservice.domain.Beer;
 import com.springframework.msscbeerservice.repositories.BeerRepository;
+import com.springframework.msscbeerservice.services.BeerService;
 import com.springframework.msscbeerservice.web.model.BeerDto;
 import com.springframework.msscbeerservice.web.model.BeerStyleEnum;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
@@ -28,10 +29,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,23 +51,25 @@ class BeerControllerTest {
     ObjectMapper objectMapper;
 
     @MockBean
-    BeerRepository beerRepository;
+    BeerService beerService;
 
     BeerDto validBeer;
+
+    public static final String BEER_1_UPC = "0631234200036";
 
     @BeforeEach
     public void setUp(){
         validBeer = BeerDto.builder()
                 .beerName("my beer")
                 .beerStyle(BeerStyleEnum.PALE_ALE)
-                .upc(123121234L)
+                .upc(BEER_1_UPC)
                 .price(new BigDecimal("5.99"))
                 .build();
     }
 
     @Test
     void getBeerById() throws Exception {
-        given(beerRepository.findById(any())).willReturn(Optional.of(Beer.builder().build()));
+        given(beerService.findBeerById(any(),anyBoolean())).willReturn(validBeer);
 
         mockMvc.perform(get("/api/v1/beer/{beerId}", UUID.randomUUID().toString())
                 .param("iscold","yes")
@@ -78,7 +83,7 @@ class BeerControllerTest {
                                 parameterWithName("iscold").description("Is Beer cold query param")
                         ),
                         responseFields(
-                                fieldWithPath("id").description("Id of beer").type(UUID.class),
+                                fieldWithPath("beerId").description("Id of beer").type(UUID.class),
                                 fieldWithPath("version").description("Version number").type(Integer.class),
                                 fieldWithPath("createdDate").description("Date Created").type(OffsetDateTime.class),
                                 fieldWithPath("lastModifiedDate").description("Date Updated").type(OffsetDateTime.class),
@@ -86,7 +91,8 @@ class BeerControllerTest {
                                 fieldWithPath("beerStyle").description("Beer Style"),
                                 fieldWithPath("upc").description("UPC of beer"),
                                 fieldWithPath("price").description("Price"),
-                                fieldWithPath("quantityOnHand").description("quantity On hand")
+                                fieldWithPath("quantityOnHand").description("quantity On hand"),
+                                fieldWithPath("mylocalDate").ignored()
                         )
                 ));
     }
@@ -97,11 +103,13 @@ class BeerControllerTest {
 
         ConstrainedFields fields = new ConstrainedFields(BeerDto.class);
 
+        given(beerService.saveNewBeer(any())).willReturn(validBeer);
+
         mockMvc.perform(post("/api/v1/beer/").contentType(MediaType.APPLICATION_JSON).content(beerDtoJson))
                 .andExpect(status().isCreated())
         .andDo(document("v1/beer-new",
                 requestFields(
-                        fields.withPath("id").ignored(),
+                        fields.withPath("beerId").ignored(),
                         fields.withPath("version").ignored(),
                         fields.withPath("createdDate").ignored(),
                         fields.withPath("lastModifiedDate").ignored(),
@@ -109,7 +117,8 @@ class BeerControllerTest {
                         fields.withPath("beerStyle").description("Beer Style"),
                         fields.withPath("upc").description("UPC of beer"),
                         fields.withPath("price").description("Price"),
-                        fields.withPath("quantityOnHand").description("quantity On hand")
+                        fields.withPath("quantityOnHand").description("quantity On hand"),
+                        fields.withPath("mylocalDate").ignored()
                 )
         ));
     }
@@ -117,6 +126,7 @@ class BeerControllerTest {
     @Test
     void updateBeerById() throws Exception {
         String beerDtoJson = objectMapper.writeValueAsString(validBeer);
+        given(beerService.updateBeerById(any(),any())).willReturn(validBeer);
         mockMvc.perform(put("/api/v1/beer/"+UUID.randomUUID().toString()).contentType(MediaType.APPLICATION_JSON).content(beerDtoJson))
                 .andExpect(status().isNoContent());
     }
