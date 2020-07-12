@@ -2,7 +2,7 @@ package com.springframework.msscbeerservice.bootstrap;
 
 import com.springframework.msscbeerservice.domain.Beer;
 import com.springframework.msscbeerservice.repositories.BeerRepository;
-import com.springframework.msscbeerservice.web.model.BeerStyleEnum;
+import com.springframework.brewery.model.BeerStyleEnum;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

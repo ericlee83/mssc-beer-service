@@ -1,6 +1,8 @@
 package com.springframework.msscbeerservice.web.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springframework.brewery.model.BeerDto;
+import com.springframework.brewery.model.BeerStyleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;

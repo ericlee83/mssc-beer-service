@@ -1,10 +1,9 @@
 package com.springframework.msscbeerservice.web.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.springframework.brewery.model.BeerDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @JsonTest
 class BeerDtoTest extends BaseTest{

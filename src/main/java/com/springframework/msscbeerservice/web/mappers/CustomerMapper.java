@@ -1,7 +1,7 @@
 package com.springframework.msscbeerservice.web.mappers;
 
 import com.springframework.msscbeerservice.domain.Customer;
-import com.springframework.msscbeerservice.web.model.CustomerDto;
+import com.springframework.brewery.model.CustomerDto;
 import org.mapstruct.Mapper;
 
 @Mapper

@@ -1,16 +1,12 @@
 package com.springframework.msscbeerservice.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springframework.msscbeerservice.domain.Beer;
-import com.springframework.msscbeerservice.repositories.BeerRepository;
 import com.springframework.msscbeerservice.services.BeerService;
-import com.springframework.msscbeerservice.web.model.BeerDto;
-import com.springframework.msscbeerservice.web.model.BeerStyleEnum;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import com.springframework.brewery.model.BeerDto;
+import com.springframework.brewery.model.BeerStyleEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,7 +21,6 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;

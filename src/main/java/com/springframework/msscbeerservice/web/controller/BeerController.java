@@ -1,11 +1,9 @@
 package com.springframework.msscbeerservice.web.controller;
 
 import com.springframework.msscbeerservice.services.BeerService;
-import com.springframework.msscbeerservice.web.model.BeerDto;
-import com.springframework.msscbeerservice.web.model.BeerPagedList;
-import lombok.AllArgsConstructor;
+import com.springframework.brewery.model.BeerDto;
+import com.springframework.brewery.model.BeerPagedList;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
