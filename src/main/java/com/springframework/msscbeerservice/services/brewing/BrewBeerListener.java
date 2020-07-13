@@ -1,11 +1,11 @@
 package com.springframework.msscbeerservice.services.brewing;
 
+import com.springframework.brewery.model.BeerDto;
+import com.springframework.brewery.model.events.BeerEvent;
+import com.springframework.brewery.model.events.NewInventoryEvent;
 import com.springframework.msscbeerservice.config.JmsConfig;
 import com.springframework.msscbeerservice.domain.Beer;
-import com.springframework.brewery.model.events.BrewBeerEvent;
-import com.springframework.brewery.model.events.NewInventoryEvent;
 import com.springframework.msscbeerservice.repositories.BeerRepository;
-import com.springframework.brewery.model.BeerDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -23,7 +23,7 @@ public class BrewBeerListener {
 
     @Transactional
     @JmsListener(destination = JmsConfig.BEER_REQUEST)
-    public void listen(BrewBeerEvent event){
+    public void listen(BeerEvent event){
         BeerDto beerDto = event.getBeerDto();
         Beer beer = beerRepository.getOne(beerDto.getId());
         beerDto.setQuantityOnHand(beer.getQuantityToBrew());
