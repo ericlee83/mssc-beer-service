@@ -12,6 +12,8 @@ public class JmsConfig {
 
     public static final String BEER_REQUEST = "brewing-request";
     public static final String NEW_INVENTORY = "new-inventory";
+    public static final String VALIDATE_ORDER = "validate-order";
+    public static final String VALIDATE_ORDER_RESPONSE = "validate_order_response";
 
     @Bean
     public MessageConverter messageConverter(ObjectMapper objectMapper){
