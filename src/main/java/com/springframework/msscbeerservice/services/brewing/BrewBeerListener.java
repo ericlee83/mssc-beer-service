@@ -13,6 +13,8 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,10 +27,12 @@ public class BrewBeerListener {
     @JmsListener(destination = JmsConfig.BEER_REQUEST)
     public void listen(BeerEvent event){
         BeerDto beerDto = event.getBeerDto();
-        Beer beer = beerRepository.getOne(beerDto.getId());
-        beerDto.setQuantityOnHand(beer.getQuantityToBrew());
-        NewInventoryEvent newInventoryEvent = new NewInventoryEvent(beerDto);
-        log.debug("Brewed beer "+ beer.getMinOnHand()+" : QOH: "+beerDto.getQuantityOnHand());
-        jmsTemplate.convertAndSend(JmsConfig.NEW_INVENTORY,newInventoryEvent);
+        Optional<Beer> beerOptional = beerRepository.findById(beerDto.getId());
+        beerOptional.ifPresentOrElse(beer -> {
+            beerDto.setQuantityOnHand(beer.getQuantityToBrew());
+            NewInventoryEvent newInventoryEvent = new NewInventoryEvent(beerDto);
+            log.debug("Brewed beer "+ beer.getMinOnHand()+" : QOH: "+beerDto.getQuantityOnHand());
+            jmsTemplate.convertAndSend(JmsConfig.NEW_INVENTORY,newInventoryEvent);
+        },()->log.error("beer not found id: "+beerDto.getId()));
     }
 }
