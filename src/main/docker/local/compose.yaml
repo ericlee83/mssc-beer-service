@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  jms:
+    image: vromero/activemq-artemis
+    ports:
+    - 8161:8161
+    - 61616:61616
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+    - 9411:9411
+  eureka:
+    image: wle44beerwork/mssc-brewery-eureka
+    ports:
+    - 8761:8761
+  config:
+    image: wle44beerwork/mssc-config-server
+    ports:
+    - 8888:8888
+    depends_on:
+      - eureka
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://netflix:eureka@eureka:8761/eureka/
+  inventory-service:
+    image: wle44beerwork/mssc-beer-inventory-service
+    ports:
+    - 8082:8082
+    depends_on:
+      - eureka
+      - config
+      - jms
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://netflix:eureka@eureka:8761/eureka/
+      SPRING_PROFILES_ACTIVE: local-discovery,localmysql
+      SPRING_ZIPKIN_BASEURL: http://zipkin
+      SPRING_ARTEMIS_HOST: jms
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/beerinventoryservice?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
